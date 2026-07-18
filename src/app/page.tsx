@@ -1,4 +1,6 @@
 import Categories from "@/components/Categories";
+import CTA from "@/components/CTA";
+import FAQ from "@/components/FAQ";
 import Features from "@/components/Features";
 import Hero from "@/components/Hero";
 import Stats from "@/components/Stats";
@@ -12,6 +14,8 @@ export default function Home() {
       <Stats />
       <Categories />
       <Testimonials />
+      <FAQ />
+      <CTA />
     </div>
   );
 }
