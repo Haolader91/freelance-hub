@@ -21,7 +21,7 @@ export default function Footer() {
     setYear(new Date().getFullYear());
   }, []);
 
-  // 📂 Structured Footer Links
+  // Structured Footer Links
   const platformLinks: FooterSection = {
     title: "Platform",
     links: [

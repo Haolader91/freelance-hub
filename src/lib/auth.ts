@@ -13,16 +13,15 @@ export const auth = betterAuth({
     enabled: true,
   },
   database: mongodbAdapter(db, {
-    // Optional: if you don't provide a client, database transactions won't be enabled.
     client,
   }),
-  // রোল ডাটাবেজে স্টোর করার জন্য অ্যাডিশনাল ফিল্ড যোগ করা হলো
+
   user: {
     additionalFields: {
       role: {
         type: "string",
         required: true,
-        defaultValue: "FREELANCER", // ডিফল্ট রোল
+        defaultValue: "FREELANCER",
       },
     },
   },
