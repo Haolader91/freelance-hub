@@ -14,8 +14,8 @@ import {
   FiLayout,
 } from "react-icons/fi";
 import { authClient } from "../lib/auth-client";
+import { toast } from "react-toastify";
 
-// Better Type safety for better developer experience
 interface UserSession {
   user: {
     id: string;
@@ -26,11 +26,15 @@ interface UserSession {
   };
 }
 
+interface NavLink {
+  name: string;
+  href: string;
+}
+
 const Navbar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // authClient hook-এর রিটার্ন টাইপ ডিফাইন করা
   const { data: session, isPending } = authClient.useSession() as {
     data: UserSession | null;
     isPending: boolean;
@@ -50,10 +54,20 @@ const Navbar: React.FC = () => {
   const toggleMenu = (): void => setIsOpen(!isOpen);
   const toggleDropdown = (): void => setIsDropdownOpen(!isDropdownOpen);
 
+  const navLinks: NavLink[] = [
+    { name: "Home", href: "/" },
+    { name: "Explore", href: "/explore" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+    ...(isMounted && isLoggedIn
+      ? [{ name: "Dashboard", href: "/dashboard" }]
+      : []),
+  ];
+
   const handleLogout = async (): Promise<void> => {
     try {
       await authClient.signOut();
-      toast.success("Disconnected Node successfully! 👋");
+      toast.success("Disconnected Node successfully!");
       setIsDropdownOpen(false);
       setIsOpen(false);
       router.push("/");
@@ -67,7 +81,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="sticky top-0 z-50 w-full bg-slate-950 border-b border-slate-900 backdrop-blur-md bg-opacity-90 shadow-sm text-white">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        {/* 🚀 Logo Part */}
+        {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="p-2 bg-blue-600/10 rounded-xl border border-blue-500/20 group-hover:bg-blue-600/20 transition-all">
             <HiCpuChip className="text-blue-400 text-xl" />
@@ -77,61 +91,28 @@ const Navbar: React.FC = () => {
           </span>
         </Link>
 
-        {/* 🧭 Desktop Menu Links */}
+        {/*  Desktop Navigation Links*/}
         <div className="hidden md:flex items-center gap-8">
-          <Link
-            href="/"
-            className={`text-sm font-semibold transition-colors ${
-              pathname === "/"
-                ? "text-blue-400"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            href="/explore"
-            className={`text-sm font-semibold transition-colors ${
-              pathname.startsWith("/explore")
-                ? "text-blue-400"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Explore
-          </Link>
-          <Link
-            href="/about"
-            className={`text-sm font-semibold transition-colors ${
-              pathname.startsWith("/about")
-                ? "text-blue-400"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            About
-          </Link>
-          <Link
-            href="/contact"
-            className={`text-sm font-semibold transition-colors ${
-              pathname.startsWith("/contact")
-                ? "text-blue-400"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Contact
-          </Link>
+          {navLinks.map((link) => {
+            const isActive =
+              link.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(link.href);
 
-          {isMounted && isLoggedIn && (
-            <Link
-              href="/dashboard"
-              className={`text-sm font-semibold transition-colors ${
-                pathname.startsWith("/dashboard")
-                  ? "text-blue-400"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              Dashboard
-            </Link>
-          )}
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-sm font-semibold transition-colors ${
+                  isActive
+                    ? "text-blue-400"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
         </div>
 
         {/* 👤 Desktop Login & User Dropdown */}
@@ -157,7 +138,7 @@ const Navbar: React.FC = () => {
             <div className="relative">
               <button
                 onClick={toggleDropdown}
-                className="flex items-center gap-3 p-1.5 pr-3 bg-slate-900 hover:bg-slate-850 border border-slate-850 rounded-full transition-all focus:outline-none"
+                className="flex items-center gap-3 p-1.5 pr-3 bg-slate-900 hover:bg-slate-850 border border-slate-850 rounded-full transition-all focus:outline-none cursor-pointer"
               >
                 <div className="relative w-8 h-8 rounded-full overflow-hidden border border-blue-500/30 shrink-0 bg-blue-600/20 flex items-center justify-center text-xs font-bold text-blue-400 uppercase">
                   {user?.image ? (
@@ -235,7 +216,7 @@ const Navbar: React.FC = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-950/30 transition-all text-left"
+                    className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-950/30 transition-all text-left cursor-pointer"
                   >
                     <FiLogOut />
                     <span>Disconnect</span>
@@ -250,7 +231,7 @@ const Navbar: React.FC = () => {
         <div className="md:hidden flex items-center">
           <button
             onClick={toggleMenu}
-            className="text-slate-400 hover:text-slate-200 focus:outline-none p-1"
+            className="text-slate-400 hover:text-slate-200 focus:outline-none p-1 cursor-pointer"
           >
             {isOpen ? (
               <FiX className="text-2xl" />
@@ -261,56 +242,31 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* 📱 Mobile Responsive Menu */}
+      {/* Mobile Responsive Menu */}
       {isOpen && (
         <div className="md:hidden bg-slate-950 border-b border-slate-900 px-6 py-6 space-y-4">
           <div className="flex flex-col space-y-4">
-            <Link
-              href="/"
-              onClick={toggleMenu}
-              className={`text-sm font-semibold transition-colors ${
-                pathname === "/"
-                  ? "text-blue-400"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/explore"
-              onClick={toggleMenu}
-              className={`text-sm font-semibold transition-colors ${
-                pathname.startsWith("/explore")
-                  ? "text-blue-400"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              Explore
-            </Link>
-            <Link
-              href="/about"
-              onClick={toggleMenu}
-              className={`text-sm font-semibold transition-colors ${
-                pathname.startsWith("/about")
-                  ? "text-blue-400"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              About
-            </Link>
-            {isMounted && isLoggedIn && (
-              <Link
-                href="/dashboard"
-                onClick={toggleMenu}
-                className={`text-sm font-semibold transition-colors ${
-                  pathname.startsWith("/dashboard")
-                    ? "text-blue-400"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Dashboard
-              </Link>
-            )}
+            {navLinks.map((link) => {
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href);
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={toggleMenu}
+                  className={`text-sm font-semibold transition-colors ${
+                    isActive
+                      ? "text-blue-400"
+                      : "text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="h-[1px] bg-slate-900 my-4" />
@@ -374,7 +330,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center justify-center gap-2 bg-rose-950/40 hover:bg-rose-900/30 text-rose-400 border border-rose-900/40 py-2.5 rounded-xl text-xs font-bold transition-all"
+                  className="flex items-center justify-center gap-2 bg-rose-950/40 hover:bg-rose-900/30 text-rose-400 border border-rose-900/40 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
                 >
                   <FiLogOut />
                   <span>Disconnect</span>
