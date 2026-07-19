@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+// import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -30,8 +30,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="suppressHydrationWarning">
-        {children}
+      <body className="min-h-screen flex flex-col bg-slate-950 text-white">
+        <Navbar />
+        <main className="flex-1 w-full">{children}</main>
+        <Footer />
         <ToastContainer position="top-center" />
       </body>
     </html>
