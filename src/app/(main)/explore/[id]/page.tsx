@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getJobById, JobCard } from "@/lib/getApi/jobs";
+import ApplyJobModal from "@/components/ApplyJobModal";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const [job, setJob] = useState<JobCard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // ২. মডাল ওপেন/ক্লোজ স্টেট
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -150,7 +154,11 @@ export default function JobDetailsPage() {
                 </div>
               </div>
 
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-xs transition-colors cursor-pointer shadow-lg shadow-blue-900/20|">
+              {/* ৩. বাজেট সাইডবারের ভেতরের বাটনে স্টেট ট্রিগার করুন */}
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-xs transition-colors cursor-pointer shadow-lg shadow-blue-900/20"
+              >
                 Apply to This Project
               </button>
             </div>
@@ -181,6 +189,14 @@ export default function JobDetailsPage() {
           </div>
         </div>
       </div>
+      {/* ৪. রিটার্ন মেথডের একদম নিচে কম্পোনেন্টটি এভাবে বসিয়ে দিন */}
+      {job && (
+        <ApplyJobModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          job={job}
+        />
+      )}
     </div>
   );
 }
