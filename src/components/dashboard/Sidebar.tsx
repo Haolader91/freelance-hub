@@ -24,7 +24,6 @@ export default function Sidebar() {
 
   const freelancerLinks = [
     { name: "Overview Dashboard", path: "/dashboard" },
-
     { name: "💼 Applied Jobs", path: "/dashboard/freelancer/applied-jobs" },
     { name: "🔍 Browse Jobs", path: "/dashboard/freelancer/browse-jobs" },
     { name: "💼 My Proposals", path: "/dashboard/freelancer/my-proposals" },
@@ -32,9 +31,7 @@ export default function Sidebar() {
 
   const clientLinks = [
     { name: "Overview Dashboard", path: "/dashboard" },
-
     { name: "📊 Workspace Analytics", path: "/dashboard/client/analytics" },
-
     { name: "🤝 Hire Freelancer", path: "/dashboard/client/hire-freelancer" },
     { name: "📁 My Posted Jobs", path: "/dashboard/client/my-posted-jobs" },
     { name: "➕ Post New Job", path: "/dashboard/client/post-job" },
@@ -75,7 +72,7 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 text-slate-400 hover:text-white bg-slate-950 border border-slate-850 rounded-lg cursor-pointer"
+          className="p-2 text-slate-400 hover:text-white bg-slate-950 border border-slate-800 rounded-lg cursor-pointer"
         >
           {isOpen ? <FaTimes size={18} /> : <FaBars size={18} />}
         </button>
@@ -83,28 +80,36 @@ export default function Sidebar() {
 
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
+      {/* Main Sidebar Drawer - z-50 for mobile */}
       <aside
-        className={`w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0 z-20
-        fixed md:sticky top-0 left-0 h-screen transition-transform duration-300 md:translate-x-0
-        ${isOpen ? "translate-x-0 top-14 h-[calc(100vh-3.5rem)]" : "-translate-x-full md:translate-x-0"}`}
+        className={`w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-6 shrink-0
+        fixed md:sticky top-0 left-0 h-screen transition-transform duration-300 z-50 md:z-20
+        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
         <div className="space-y-6">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 group border-b border-slate-850 pb-6"
-          >
-            <div className="p-2 bg-blue-600/10 rounded-xl border border-blue-500/20 group-hover:bg-blue-600/20 transition-all">
-              <HiCpuChip className="text-blue-400 text-xl" />
-            </div>
-            <span className="text-xl font-extrabold text-slate-100 tracking-tight font-sans uppercase">
-              Freelance<span className="text-blue-400">.Hub</span>
-            </span>
-          </Link>
+          <div className="flex items-center justify-between border-b border-slate-800 pb-6">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="p-2 bg-blue-600/10 rounded-xl border border-blue-500/20 group-hover:bg-blue-600/20 transition-all">
+                <HiCpuChip className="text-blue-400 text-xl" />
+              </div>
+              <span className="text-xl font-extrabold text-slate-100 tracking-tight font-sans uppercase">
+                Freelance<span className="text-blue-400">.Hub</span>
+              </span>
+            </Link>
+
+            {/* Mobile Close Button inside sidebar */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="md:hidden text-slate-400 hover:text-white p-1"
+            >
+              <FaTimes size={18} />
+            </button>
+          </div>
 
           <div>
             <div className="text-[10px] font-bold tracking-widest text-slate-500 uppercase font-mono mb-3">
@@ -120,10 +125,10 @@ export default function Sidebar() {
                       key={idx}
                       href={link.path}
                       onClick={() => setIsOpen(false)}
-                      className={`block w-full text-left px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                      className={`block w-full text-left px-4 py-2.5 text-xs font-bold rounded-xl transition-all ${
                         isActive
                           ? "bg-slate-800 text-blue-400 border-l-2 border-blue-500"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-850/30"
+                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
                       }`}
                     >
                       {link.name}
@@ -134,7 +139,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-850 space-y-3">
+        <div className="pt-4 border-t border-slate-800 space-y-3">
           {isPending ? (
             <div className="flex items-center gap-3 px-2 pb-2 animate-pulse">
               <div className="w-9 h-9 rounded-xl bg-slate-800" />

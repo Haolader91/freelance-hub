@@ -59,6 +59,7 @@ export default function SignUpPage() {
       }, 1200);
     }
   };
+
   const handleSocialLogin = async () => {
     try {
       await authClient.signIn.social({
@@ -72,12 +73,18 @@ export default function SignUpPage() {
   };
 
   const handleDemoFill = () => {
-    setName("AK Haolader");
-    setEmail("demo.freelancer@example.com");
-    setPassword("DemoPassword123!");
-    setRole("FREELANCER");
+    if (role === "CLIENT") {
+      setName("AK Haolader (Client)");
+      setEmail("demo.client@example.com");
+      setPassword("DemoPassword123!");
+      toast.success("Loaded Client demo credentials!");
+    } else {
+      setName("AK Haolader");
+      setEmail("demo.freelancer@example.com");
+      setPassword("DemoPassword123!");
+      toast.success("Loaded Freelancer demo credentials!");
+    }
     setError("");
-    toast.success("Demo credentials loaded!");
   };
 
   return (
@@ -214,7 +221,7 @@ export default function SignUpPage() {
             type="button"
             className="w-full bg-slate-950 text-emerald-400 hover:bg-emerald-950/20 border border-emerald-900/40 py-2.5 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer"
           >
-            Auto-Fill Demo Credentials
+            Auto-Fill {role === "CLIENT" ? "Client" : "Freelancer"} Demo
           </button>
         </div>
 

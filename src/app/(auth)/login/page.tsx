@@ -68,11 +68,20 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoFill = () => {
+  // Freelancer Demo Fill
+  const handleFreelancerDemo = () => {
     setEmail("demo.freelancer@example.com");
     setPassword("DemoPassword123!");
     setError("");
-    toast.success("Demo credentials loaded!");
+    toast.success("Loaded Freelancer Demo Credentials!");
+  };
+
+  // Client Demo Fill
+  const handleClientDemo = () => {
+    setEmail("demo.client@example.com");
+    setPassword("DemoPassword123!");
+    setError("");
+    toast.success("Loaded Client Demo Credentials!");
   };
 
   return (
@@ -177,13 +186,23 @@ export default function LoginPage() {
             Continue with Google
           </button>
 
-          <button
-            onClick={handleDemoFill}
-            type="button"
-            className="w-full bg-slate-950 text-emerald-400 hover:bg-emerald-950/20 border border-emerald-900/40 py-2.5 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer"
-          >
-            ⚡ Auto-Fill Demo Credentials
-          </button>
+          {/* Quick Demo Fill Buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleFreelancerDemo}
+              type="button"
+              className="bg-slate-950 text-emerald-400 hover:bg-emerald-950/20 border border-emerald-900/40 py-2 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer"
+            >
+              ⚡ Demo Freelancer
+            </button>
+            <button
+              onClick={handleClientDemo}
+              type="button"
+              className="bg-slate-950 text-amber-400 hover:bg-amber-950/20 border border-amber-900/40 py-2 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all cursor-pointer"
+            >
+              ⚡ Demo Client
+            </button>
+          </div>
         </div>
 
         <p className="text-center text-xs text-slate-500 mt-6">
