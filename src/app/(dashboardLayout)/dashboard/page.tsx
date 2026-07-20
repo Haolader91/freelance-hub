@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
-import { CiWarning } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
 import {
   getClientApplications,
@@ -11,7 +10,6 @@ import {
 } from "@/lib/getApi/jobs";
 
 export default function UnifiedRoleDashboard() {
-  const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [clientApplicationsCount, setClientApplicationsCount] =
     useState<number>(0);
@@ -123,30 +121,21 @@ export default function UnifiedRoleDashboard() {
             structure.
           </p>
         </div>
-
-        {userRole === "freelancer" && (
-          <button
-            onClick={() => setShowProfileSetup(true)}
-            className="sm:self-center bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-1.5"
-          >
-            <CiWarning size={16} /> Profile 85% Complete
-          </button>
-        )}
       </div>
 
       {/* 📊 CONDITION A: FREELANCER METRICS */}
       {userRole === "freelancer" && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10 animate-in fade-in duration-200">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-10 animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl col-span-2 lg:col-span-1">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1">
               <FaCheck className="text-emerald-400" />
-              Profile Completion
+              Profile Status
             </div>
             <div className="text-xl font-extrabold text-emerald-400 font-mono">
-              85%
+              Active
             </div>
             <div className="w-full bg-slate-950 h-1 rounded-full mt-2 overflow-hidden border border-slate-850">
-              <div className="bg-emerald-500 h-full w-[85%] rounded-full" />
+              <div className="bg-emerald-500 h-full w-[100%] rounded-full" />
             </div>
           </div>
 
@@ -162,31 +151,14 @@ export default function UnifiedRoleDashboard() {
 
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              ❤️ Saved Jobs
-            </div>
-            <div className="text-xl font-extrabold text-rose-400 font-mono">
-              0
-            </div>
-          </div>
-
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              🤖 AI Recommended
-            </div>
-            <div className="text-xl font-extrabold text-indigo-400 font-mono">
-              15
-            </div>
-          </div>
-
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              📄 Shortlisted
+              📄 Shortlisted / Interview
             </div>
             <div className="text-xl font-extrabold text-amber-400 font-mono">
               {
                 freelancerApplications.filter(
                   (a) =>
-                    a.status === "shortlisted" || a.status === "Shortlisted",
+                    a.status?.toLowerCase() === "shortlisted" ||
+                    a.status?.toLowerCase() === "interview",
                 ).length
               }
             </div>
@@ -196,7 +168,7 @@ export default function UnifiedRoleDashboard() {
 
       {/* 📊 CONDITION B: CLIENT METRICS */}
       {userRole === "client" && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 animate-in fade-in duration-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
               📢 Active Jobs
@@ -213,29 +185,13 @@ export default function UnifiedRoleDashboard() {
               {isJobsLoading ? "..." : clientApplicationsCount}
             </div>
           </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              🤝 Hired Freelancers
-            </div>
-            <div className="text-xl font-extrabold text-emerald-400 font-mono">
-              0
-            </div>
-          </div>
-          <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              🤖 AI Devs Match
-            </div>
-            <div className="text-xl font-extrabold text-purple-400 font-mono">
-              24
-            </div>
-          </div>
         </div>
       )}
 
       {/* 🔄 Dynamic Feed Context */}
       <div className="space-y-8">
         {userRole === "freelancer" ? (
-          /* FREELANCER RECENT APPLICATIONS (DYNAMIC BACKEND DATA) */
+          /* FREELANCER RECENT APPLICATIONS */
           <div className="animate-in fade-in duration-200">
             <h2 className="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest font-mono flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-500" /> Recent
@@ -271,11 +227,10 @@ export default function UnifiedRoleDashboard() {
                     </div>
                     <span
                       className={`text-[9px] font-extrabold uppercase px-2.5 py-1 rounded border font-mono tracking-wider ${
-                        app.status === "Interview" ||
-                        app.status === "shortlisted"
+                        app.status?.toLowerCase() === "interview" ||
+                        app.status?.toLowerCase() === "shortlisted"
                           ? "bg-emerald-950/40 border-emerald-900 text-emerald-400"
-                          : app.status === "Rejected" ||
-                              app.status === "rejected"
+                          : app.status?.toLowerCase() === "rejected"
                             ? "bg-rose-950/40 border-rose-900 text-rose-400"
                             : "bg-amber-950/40 border-amber-900 text-amber-400"
                       }`}
@@ -292,11 +247,19 @@ export default function UnifiedRoleDashboard() {
           <div className="animate-in fade-in duration-200">
             <h2 className="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest font-mono flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" /> Client
-              Workspace Status
+              Workspace Pipeline Status
             </h2>
-            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs text-slate-400 font-mono">
-              Review applicant responses directly from the Inbound Pipelines
-              menu.
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs text-slate-300 font-mono flex items-center justify-between">
+              <span>
+                Total{" "}
+                <strong className="text-blue-400">
+                  {clientApplicationsCount}
+                </strong>{" "}
+                proposals received for active positions.
+              </span>
+              <span className="text-[10px] text-emerald-400 border border-emerald-900 bg-emerald-950/30 px-2 py-0.5 rounded">
+                Active Review
+              </span>
             </div>
           </div>
         )}
@@ -306,14 +269,14 @@ export default function UnifiedRoleDashboard() {
           <div>
             <h2 className="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest font-mono">
               {userRole === "freelancer"
-                ? "🤖 Recommended Jobs"
+                ? "💡 Application Pipeline"
                 : "📢 Recent Posted Jobs"}
             </h2>
 
             {userRole === "freelancer" ? (
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400">
-                AI Agent has matched 15 target listings to your current
-                technical stack (React, Next.js, Tailwind CSS).
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400 font-mono">
+                Track your active proposals, shortlisted statuses, and client
+                interaction directly from this panel.
               </div>
             ) : (
               <div className="space-y-2">
@@ -367,12 +330,12 @@ export default function UnifiedRoleDashboard() {
 
           <div>
             <h2 className="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest font-mono">
-              Latest Messages
+              System Notice
             </h2>
             <div className="bg-slate-900 border border-slate-800 rounded-xl divide-y divide-slate-850 overflow-hidden">
               <div className="p-3 text-xs flex justify-between items-center hover:bg-slate-850/20">
-                <span className="text-slate-300 font-medium">
-                  System Core Sync
+                <span className="text-slate-300 font-medium font-mono">
+                  System Core Sync Active
                 </span>
                 <span className="text-[10px] text-slate-600 font-mono">
                   Just now
@@ -382,57 +345,6 @@ export default function UnifiedRoleDashboard() {
           </div>
         </div>
       </div>
-
-      {/* 🛠️ PROFILE SETUP MODAL */}
-      {showProfileSetup && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-xl p-6 space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-200 font-mono">
-                ⚙️ Profile System Setup
-              </h3>
-              <button
-                onClick={() => setShowProfileSetup(false)}
-                className="text-xs text-slate-500 hover:text-white font-mono cursor-pointer"
-              >
-                [CLOSE]
-              </button>
-            </div>
-            <p className="text-xs text-slate-400">
-              Update your professional metadata preferences, skills
-              configuration stacks, and verification parameters.
-            </p>
-            <div className="space-y-3 pt-2">
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 uppercase mb-1">
-                  Display Title / Brand Name
-                </label>
-                <input
-                  type="text"
-                  defaultValue={user?.name || "User Name"}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-600"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-mono text-slate-500 uppercase mb-1">
-                  Core Tech Stack Tags
-                </label>
-                <input
-                  type="text"
-                  defaultValue="React, Next.js, Tailwind CSS"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-600 font-mono"
-                />
-              </div>
-            </div>
-            <button
-              onClick={() => setShowProfileSetup(false)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-xl mt-4 transition-all cursor-pointer"
-            >
-              Save Setup Changes
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
