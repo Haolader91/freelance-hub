@@ -24,26 +24,16 @@ export default function Sidebar() {
 
   const freelancerLinks = [
     { name: "Overview Dashboard", path: "/dashboard" },
-    {
-      name: "🤖 AI Recommendation",
-      path: "/dashboard/freelancer/ai-recommendation",
-    },
+
     { name: "💼 Applied Jobs", path: "/dashboard/freelancer/applied-jobs" },
     { name: "🔍 Browse Jobs", path: "/dashboard/freelancer/browse-jobs" },
-    {
-      name: "👤 Complete Profile",
-      path: "/dashboard/freelancer/complete-profile",
-    },
   ];
 
   const clientLinks = [
     { name: "Overview Dashboard", path: "/dashboard" },
-    {
-      name: "🤖 AI Recommendation",
-      path: "/dashboard/client/ai-recommendation",
-    },
+
     { name: "📊 Workspace Analytics", path: "/dashboard/client/analytics" },
-    { name: "🏢 Company Profile", path: "/dashboard/client/company-profile" },
+
     { name: "🤝 Hire Freelancer", path: "/dashboard/client/hire-freelancer" },
     { name: "📁 My Posted Jobs", path: "/dashboard/client/my-posted-jobs" },
     { name: "➕ Post New Job", path: "/dashboard/client/post-job" },

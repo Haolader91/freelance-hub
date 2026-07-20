@@ -4,13 +4,17 @@ import { useState, useEffect } from "react";
 import { FaSearch, FaFilter, FaPaperPlane } from "react-icons/fa";
 import Image from "next/image";
 import { getFreelancers } from "@/lib/getApi/jobs";
+import OfferModal from "@/components/dashboard/OfferModal";
 
 export default function HireFreelancerPage() {
   const [talents, setTalents] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch data on component mount
+  const [selectedFreelancer, setSelectedFreelancer] = useState<any | null>(
+    null,
+  );
+
   useEffect(() => {
     async function fetchTalents() {
       try {
@@ -29,16 +33,13 @@ export default function HireFreelancerPage() {
     fetchTalents();
   }, []);
 
-  // 2. Safe Filtering (MongoDB Structure অনুযায়ী)
   const filteredTalents = talents.filter((t) => {
     const query = searchQuery.toLowerCase();
 
-    // ডাটাবেজের ফিল্ডগুলো নিরাপদে চেক করা
     const nameMatch = t.name ? t.name.toLowerCase().includes(query) : false;
     const emailMatch = t.email ? t.email.toLowerCase().includes(query) : false;
     const roleMatch = t.role ? t.role.toLowerCase().includes(query) : false;
 
-    // Optional Fields (যদি ভবিষ্যতে এড করো)
     const titleMatch = t.title ? t.title.toLowerCase().includes(query) : false;
     const skillMatch = Array.isArray(t.skills)
       ? t.skills.some((s: string) => s.toLowerCase().includes(query))
@@ -48,7 +49,7 @@ export default function HireFreelancerPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       {/* Header */}
       <div className="border-b border-slate-900 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -126,12 +127,23 @@ export default function HireFreelancerPage() {
                 </div>
               </div>
 
-              <button className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-blue-400 p-2.5 rounded-xl transition-all cursor-pointer text-xs flex items-center gap-1.5 font-bold shrink-0">
+              <button
+                onClick={() => setSelectedFreelancer(t)}
+                className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-blue-400 p-2.5 rounded-xl transition-all cursor-pointer text-xs flex items-center gap-1.5 font-bold shrink-0"
+              >
                 <FaPaperPlane size={10} /> Offer
               </button>
             </div>
           ))}
         </div>
+      )}
+
+      {/*  Selected Freelancer  */}
+      {selectedFreelancer && (
+        <OfferModal
+          freelancer={selectedFreelancer}
+          onClose={() => setSelectedFreelancer(null)}
+        />
       )}
     </div>
   );
