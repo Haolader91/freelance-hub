@@ -27,6 +27,7 @@ export default function Sidebar() {
 
     { name: "💼 Applied Jobs", path: "/dashboard/freelancer/applied-jobs" },
     { name: "🔍 Browse Jobs", path: "/dashboard/freelancer/browse-jobs" },
+    { name: "💼 My Proposals", path: "/dashboard/freelancer/my-proposals" },
   ];
 
   const clientLinks = [

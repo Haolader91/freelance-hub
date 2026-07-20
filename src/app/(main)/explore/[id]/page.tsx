@@ -12,7 +12,6 @@ export default function JobDetailsPage() {
   const [job, setJob] = useState<JobCard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ২. মডাল ওপেন/ক্লোজ স্টেট
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -154,7 +153,6 @@ export default function JobDetailsPage() {
                 </div>
               </div>
 
-              {/* ৩. বাজেট সাইডবারের ভেতরের বাটনে স্টেট ট্রিগার করুন */}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-xs transition-colors cursor-pointer shadow-lg shadow-blue-900/20"
@@ -189,7 +187,7 @@ export default function JobDetailsPage() {
           </div>
         </div>
       </div>
-      {/* ৪. রিটার্ন মেথডের একদম নিচে কম্পোনেন্টটি এভাবে বসিয়ে দিন */}
+
       {job && (
         <ApplyJobModal
           isOpen={isModalOpen}

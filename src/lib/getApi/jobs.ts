@@ -168,3 +168,35 @@ export const getFreelancers = async () => {
     return { success: false, freelancers: [] };
   }
 };
+
+// =====================
+export const getAnalyticsData = async () => {
+  try {
+    const res = await fetch(`${baseUrl}/api/analytics`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch analytics");
+    return await res.json();
+  } catch (error) {
+    console.error("Error in getAnalyticsData:", error);
+    return { success: false, analytics: null };
+  }
+};
+
+// ========================================
+export const getFreelancerOffers = async (email: string) => {
+  try {
+    const res = await fetch(`${baseUrl}/api/offers/freelancer/${email}`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch offers");
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error in getFreelancerOffers action:", error);
+    return { success: false, offers: [] };
+  }
+};

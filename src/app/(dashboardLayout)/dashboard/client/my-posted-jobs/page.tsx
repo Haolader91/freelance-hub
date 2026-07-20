@@ -3,23 +3,7 @@
 import { useState, useEffect } from "react";
 import { FaBriefcase, FaEllipsisV } from "react-icons/fa";
 import { useSession } from "@/lib/auth-client";
-import { getClientPostedJobs } from "@/lib/getApi/jobs";
-
-interface JobCard {
-  _id: string;
-  title: string;
-  shortDesc: string;
-  fullDesc: string;
-  category: string;
-  minBudget: number;
-  maxBudget: number;
-  deadline: string;
-  requirements: string[];
-  clientName: string;
-  clientEmail?: string;
-  status?: "Active" | "Closed" | "Draft";
-  applicants?: number;
-}
+import { getClientPostedJobs, JobCard } from "@/lib/getApi/jobs";
 
 export default function MyPostedJobsPage() {
   const { data: session } = useSession();

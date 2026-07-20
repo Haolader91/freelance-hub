@@ -77,6 +77,7 @@ export default function AddProjectPage() {
         deadline,
         requirements,
         clientName: session?.user?.name || "Anonymous",
+        clientEmail: session?.user?.email,
       });
 
       if (resData?.error) {

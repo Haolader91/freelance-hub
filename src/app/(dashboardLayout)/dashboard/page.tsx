@@ -1,73 +1,94 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { useSession } from "@/lib/auth-client";
 import { CiWarning } from "react-icons/ci";
 import { FaCheck } from "react-icons/fa";
-
-interface FreelancerJob {
-  id: string;
-  role: string;
-  company: string;
-  status: "Interview" | "Pending" | "Rejected";
-  score: number;
-}
-
-interface ClientApplicant {
-  id: string;
-  name: string;
-  appliedRole: string;
-  matchScore: number;
-  status: "Shortlisted" | "Reviewed" | "New";
-}
+import {
+  getClientApplications,
+  getClientPostedJobs,
+  getFreelancerApplications,
+} from "@/lib/getApi/jobs";
 
 export default function UnifiedRoleDashboard() {
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [clientApplicationsCount, setClientApplicationsCount] =
+    useState<number>(0);
+
+  // Client States
+  const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [isJobsLoading, setIsJobsLoading] = useState(false);
+
+  // Freelancer States
+  const [freelancerApplications, setFreelancerApplications] = useState<any[]>(
+    [],
+  );
+  const [isAppsLoading, setIsAppsLoading] = useState(false);
 
   const { data: session, isPending } = useSession();
-  const user = session?.user;
+  const user = session?.user as any;
 
-  const userRole = (user as any)?.role?.toLowerCase() || "freelancer";
+  const userRole = user?.role?.toLowerCase() || "freelancer";
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const [freelancerJobs] = useState<FreelancerJob[]>([
-    {
-      id: "1",
-      role: "Next.js / React Specialist",
-      company: "LogiChain.AI Ecosystem",
-      status: "Interview",
-      score: 98,
-    },
-    {
-      id: "2",
-      role: "Full-Stack TypeScript Developer",
-      company: "CyberNetix Solutions",
-      status: "Pending",
-      score: 92,
-    },
-  ]);
+  // Fetch Data based on User Role
+  useEffect(() => {
+    if (!user?.email) return;
 
-  const [clientApplicants] = useState<ClientApplicant[]>([
-    {
-      id: "app-1",
-      name: "Tamim Iqbal",
-      appliedRole: "Next.js Developer",
-      matchScore: 98,
-      status: "Shortlisted",
-    },
-    {
-      id: "app-2",
-      name: "Juniya Rahman",
-      appliedRole: "UI/UX Designer",
-      matchScore: 89,
-      status: "New",
-    },
-  ]);
+    if (userRole === "client") {
+      async function fetchClientDashboardData() {
+        try {
+          setIsJobsLoading(true);
+          // Posted Jobs Fetch
+          const data = await getClientPostedJobs(user.email);
+          setRecentJobs(
+            Array.isArray(data)
+              ? data.slice(0, 5)
+              : data?.jobs?.slice(0, 5) || [],
+          );
+
+          // Inbound Applications Fetch for Total Applicants Count
+          const appsRes = await getClientApplications(user.email);
+          if (appsRes?.success) {
+            setClientApplicationsCount(appsRes.applications?.length || 0);
+          } else if (Array.isArray(appsRes)) {
+            setClientApplicationsCount(appsRes.length);
+          }
+        } catch (error) {
+          console.error("Error fetching client dashboard data:", error);
+        } finally {
+          setIsJobsLoading(false);
+        }
+      }
+      fetchClientDashboardData();
+    } else {
+      async function fetchFreelancerApps() {
+        try {
+          setIsAppsLoading(true);
+          const res = await getFreelancerApplications(user.email);
+          if (Array.isArray(res)) {
+            setFreelancerApplications(res);
+          } else if (res?.applications) {
+            setFreelancerApplications(res.applications);
+          } else if (res?.success && Array.isArray(res.data)) {
+            setFreelancerApplications(res.data);
+          }
+        } catch (error) {
+          console.error(
+            "Error fetching freelancer dashboard applications:",
+            error,
+          );
+        } finally {
+          setIsAppsLoading(false);
+        }
+      }
+      fetchFreelancerApps();
+    }
+  }, [user?.email, userRole]);
 
   if (!isMounted || isPending) {
     return (
@@ -93,7 +114,7 @@ export default function UnifiedRoleDashboard() {
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-100">
               Client Console{" "}
               <span className="text-indigo-400 font-medium">
-                Welcome, {user?.name || "TechSoft Ltd."}
+                Welcome, {user?.name || "Client"}
               </span>
             </h1>
           )}
@@ -106,9 +127,9 @@ export default function UnifiedRoleDashboard() {
         {userRole === "freelancer" && (
           <button
             onClick={() => setShowProfileSetup(true)}
-            className="sm:self-center bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer"
+            className="sm:self-center bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs font-bold font-mono transition-all cursor-pointer flex items-center gap-1.5"
           >
-            <CiWarning /> Profile 85% Complete
+            <CiWarning size={16} /> Profile 85% Complete
           </button>
         )}
       </div>
@@ -117,8 +138,8 @@ export default function UnifiedRoleDashboard() {
       {userRole === "freelancer" && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10 animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl col-span-2 lg:col-span-1">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 font-mono">
-              <FaCheck />
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 font-mono flex items-center gap-1">
+              <FaCheck className="text-emerald-400" />
               Profile Completion
             </div>
             <div className="text-xl font-extrabold text-emerald-400 font-mono">
@@ -128,22 +149,26 @@ export default function UnifiedRoleDashboard() {
               <div className="bg-emerald-500 h-full w-[85%] rounded-full" />
             </div>
           </div>
+
+          {/* 💼 APPLIED JOBS (DYNAMIC COUNT) */}
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
               💼 Applied Jobs
             </div>
             <div className="text-xl font-extrabold text-blue-500 font-mono">
-              12
+              {isAppsLoading ? "..." : freelancerApplications.length}
             </div>
           </div>
+
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
               ❤️ Saved Jobs
             </div>
             <div className="text-xl font-extrabold text-rose-400 font-mono">
-              8
+              0
             </div>
           </div>
+
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
               🤖 AI Recommended
@@ -152,12 +177,18 @@ export default function UnifiedRoleDashboard() {
               15
             </div>
           </div>
+
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              📄 Proposals
+              📄 Shortlisted
             </div>
             <div className="text-xl font-extrabold text-amber-400 font-mono">
-              22
+              {
+                freelancerApplications.filter(
+                  (a) =>
+                    a.status === "shortlisted" || a.status === "Shortlisted",
+                ).length
+              }
             </div>
           </div>
         </div>
@@ -171,7 +202,7 @@ export default function UnifiedRoleDashboard() {
               📢 Active Jobs
             </div>
             <div className="text-xl font-extrabold text-indigo-500 font-mono">
-              10
+              {recentJobs.length}
             </div>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
@@ -179,7 +210,7 @@ export default function UnifiedRoleDashboard() {
               👥 Total Applicants
             </div>
             <div className="text-xl font-extrabold text-blue-400 font-mono">
-              145
+              {isJobsLoading ? "..." : clientApplicationsCount}
             </div>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
@@ -187,15 +218,15 @@ export default function UnifiedRoleDashboard() {
               🤝 Hired Freelancers
             </div>
             <div className="text-xl font-extrabold text-emerald-400 font-mono">
-              12
+              0
             </div>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">
-              🤖 AI Recommended Devs
+              🤖 AI Devs Match
             </div>
             <div className="text-xl font-extrabold text-purple-400 font-mono">
-              38
+              24
             </div>
           </div>
         </div>
@@ -204,64 +235,68 @@ export default function UnifiedRoleDashboard() {
       {/* 🔄 Dynamic Feed Context */}
       <div className="space-y-8">
         {userRole === "freelancer" ? (
+          /* FREELANCER RECENT APPLICATIONS (DYNAMIC BACKEND DATA) */
           <div className="animate-in fade-in duration-200">
             <h2 className="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest font-mono flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-500" /> Recent
               Applications
             </h2>
-            <div className="grid grid-cols-1 gap-3">
-              {freelancerJobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between hover:border-slate-700 transition-colors"
-                >
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-100">
-                      {job.role}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {job.company}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-[9px] font-extrabold uppercase px-2.5 py-1 rounded border font-mono tracking-wider ${job.status === "Interview" ? "bg-blue-950/40 border-blue-900 text-blue-400" : "bg-amber-950/40 border-amber-900 text-amber-400"}`}
+
+            {isAppsLoading ? (
+              <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-xl text-xs text-slate-500 font-mono animate-pulse">
+                Fetching recent applications...
+              </div>
+            ) : freelancerApplications.length === 0 ? (
+              <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl text-center text-xs text-slate-500 font-mono">
+                No job applications submitted yet.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {freelancerApplications.slice(0, 5).map((app) => (
+                  <div
+                    key={app._id || app.id}
+                    className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between hover:border-slate-700 transition-colors"
                   >
-                    {job.status}
-                  </span>
-                </div>
-              ))}
-            </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-100">
+                        {app.jobTitle || app.role || "Applied Position"}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {app.company || app.clientEmail || "Client Listing"} •
+                        Bid:{" "}
+                        <span className="text-emerald-400 font-mono font-bold">
+                          ${app.bidAmount || app.expectedSalary || "0"}
+                        </span>
+                      </p>
+                    </div>
+                    <span
+                      className={`text-[9px] font-extrabold uppercase px-2.5 py-1 rounded border font-mono tracking-wider ${
+                        app.status === "Interview" ||
+                        app.status === "shortlisted"
+                          ? "bg-emerald-950/40 border-emerald-900 text-emerald-400"
+                          : app.status === "Rejected" ||
+                              app.status === "rejected"
+                            ? "bg-rose-950/40 border-rose-900 text-rose-400"
+                            : "bg-amber-950/40 border-amber-900 text-amber-400"
+                      }`}
+                    >
+                      {app.status || "Pending"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
+          /* CLIENT WORKSPACE STATUS */
           <div className="animate-in fade-in duration-200">
             <h2 className="text-sm font-bold text-slate-200 mb-4 uppercase tracking-widest font-mono flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" /> Recent
-              Applicants
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" /> Client
+              Workspace Status
             </h2>
-            <div className="grid grid-cols-1 gap-3">
-              {clientApplicants.map((app) => (
-                <div
-                  key={app.id}
-                  className="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center justify-between hover:border-slate-700 transition-colors"
-                >
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-100">
-                      {app.name}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Applied for: {app.appliedRole}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono font-bold text-emerald-400">
-                      {app.matchScore}% Match
-                    </span>
-                    <span className="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded border border-slate-800 bg-slate-950 text-slate-400 font-mono">
-                      {app.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs text-slate-400 font-mono">
+              Review applicant responses directly from the Inbound Pipelines
+              menu.
             </div>
           </div>
         )}
@@ -274,11 +309,60 @@ export default function UnifiedRoleDashboard() {
                 ? "🤖 Recommended Jobs"
                 : "📢 Recent Posted Jobs"}
             </h2>
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400">
-              {userRole === "freelancer"
-                ? "AI Agent has matched 15 target listings to your current technical stack."
-                : `${user?.name || "TechSoft Ltd."} has 10 active job post entries listed in global directories.`}
-            </div>
+
+            {userRole === "freelancer" ? (
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400">
+                AI Agent has matched 15 target listings to your current
+                technical stack (React, Next.js, Tailwind CSS).
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {isJobsLoading && (
+                  <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-xl text-xs text-slate-500 font-mono animate-pulse">
+                    Fetching recent deployment nodes...
+                  </div>
+                )}
+
+                {!isJobsLoading && recentJobs.length === 0 && (
+                  <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl text-xs text-slate-500 font-mono">
+                    No active job entries found. Go to "Post a Job" to
+                    initialize.
+                  </div>
+                )}
+
+                {!isJobsLoading &&
+                  recentJobs.length > 0 &&
+                  recentJobs.map((job) => (
+                    <div
+                      key={job._id}
+                      className="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between hover:border-slate-750 transition-colors"
+                    >
+                      <div className="space-y-0.5 truncate pr-4">
+                        <h4 className="text-xs font-bold text-slate-200 truncate">
+                          {job.title}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500">
+                          <span className="text-blue-400">{job.category}</span>
+                          <span>•</span>
+                          <span>
+                            ${job.minBudget}-${job.maxBudget}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span
+                        className={`text-[9px] font-mono px-2 py-0.5 rounded border ${
+                          job.status === "Closed"
+                            ? "bg-slate-950 border-slate-850 text-slate-600"
+                            : "bg-emerald-950/30 border-emerald-900 text-emerald-400"
+                        }`}
+                      >
+                        {job.status || "Active"}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
 
           <div>
@@ -325,12 +409,7 @@ export default function UnifiedRoleDashboard() {
                 </label>
                 <input
                   type="text"
-                  defaultValue={
-                    user?.name ||
-                    (userRole === "freelancer"
-                      ? "Tamim Iqbal"
-                      : "TechSoft Ltd.")
-                  }
+                  defaultValue={user?.name || "User Name"}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-600"
                 />
               </div>

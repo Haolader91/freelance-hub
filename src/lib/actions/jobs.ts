@@ -81,3 +81,30 @@ export const createApplication = async (
     return { success: false, message: (error as Error).message };
   }
 };
+
+// =========================================================
+// 📩 Send Direct Offer Action
+export const sendDirectOffer = async (offerData: {
+  freelancerEmail: string;
+  freelancerName: string;
+  clientEmail: string;
+  clientName: string;
+  budget: number | string;
+  message: string;
+}) => {
+  try {
+    const res = await fetch("http://localhost:5000/api/offers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(offerData),
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error sending direct offer:", error);
+    return { success: false, message: "Network or Server error" };
+  }
+};
