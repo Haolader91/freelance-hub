@@ -103,3 +103,25 @@ export async function getClientApplications(email: string) {
     return { success: false, applications: [] };
   }
 }
+// ====================view Freelancer page all application email check===================================
+export async function getFreelancerApplications(email: string) {
+  if (!email) return { success: false, applications: [] };
+
+  try {
+    const response = await fetch(
+      `${baseUrl}/api/freelancer/my-applications?email=${encodeURIComponent(email)}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch freelancer applications");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching freelancer applications:", error);
+    return { success: false, applications: [] };
+  }
+}
