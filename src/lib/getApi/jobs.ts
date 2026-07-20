@@ -82,3 +82,24 @@ export async function getJobById(id: string): Promise<JobCard | null> {
     return null;
   }
 }
+
+// ====================view clint page all application===================================
+export async function getClientApplications(email: string) {
+  try {
+    const response = await fetch(
+      `${baseUrl}/api/client/applications?email=${email}`,
+      {
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch applications");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    return { success: false, applications: [] };
+  }
+}
