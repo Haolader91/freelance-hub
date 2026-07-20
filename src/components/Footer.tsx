@@ -26,7 +26,7 @@ export default function Footer() {
     title: "Platform",
     links: [
       { name: "Explore Projects", href: "/explore" },
-      { name: "Post a Job", href: "/items/add" },
+      { name: "About", href: "/about" },
     ],
   };
 

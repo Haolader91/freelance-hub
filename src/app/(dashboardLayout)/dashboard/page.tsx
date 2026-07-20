@@ -42,15 +42,15 @@ export default function UnifiedRoleDashboard() {
         try {
           setIsJobsLoading(true);
           // Posted Jobs Fetch
-          const data = await getClientPostedJobs(user.email);
+          const data: any = await getClientPostedJobs(user.email);
           setRecentJobs(
             Array.isArray(data)
               ? data.slice(0, 5)
-              : data?.jobs?.slice(0, 5) || [],
+              : data?.jobsCard?.slice(0, 5) || data?.jobs?.slice(0, 5) || [],
           );
 
           // Inbound Applications Fetch for Total Applicants Count
-          const appsRes = await getClientApplications(user.email);
+          const appsRes: any = await getClientApplications(user.email);
           if (appsRes?.success) {
             setClientApplicationsCount(appsRes.applications?.length || 0);
           } else if (Array.isArray(appsRes)) {
@@ -67,7 +67,7 @@ export default function UnifiedRoleDashboard() {
       async function fetchFreelancerApps() {
         try {
           setIsAppsLoading(true);
-          const res = await getFreelancerApplications(user.email);
+          const res: any = await getFreelancerApplications(user.email);
           if (Array.isArray(res)) {
             setFreelancerApplications(res);
           } else if (res?.applications) {

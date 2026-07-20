@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AIChatBot from "@/components/AIChatBot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body className="suppressHydrationWarning">
         {children}
+        <AIChatBot />
         <ToastContainer position="top-center" />
       </body>
     </html>
