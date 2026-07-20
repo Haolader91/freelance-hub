@@ -150,3 +150,21 @@ export async function updateApplicationStatus(id: string, status: string) {
     return { success: false, message: "Error updating status" };
   }
 }
+// hire-freelancer pager jonne
+export const getFreelancers = async () => {
+  try {
+    const response = await fetch(`${baseUrl}/api/freelancers`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch freelancers");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in getFreelancers:", error);
+    return { success: false, freelancers: [] };
+  }
+};
