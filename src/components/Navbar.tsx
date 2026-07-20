@@ -193,25 +193,6 @@ const Navbar: React.FC = () => {
                     <span>Dashboard</span>
                   </Link>
 
-                  <Link
-                    href="/dashboard/profile"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      pathname.startsWith("/dashboard/profile")
-                        ? "text-blue-400 bg-blue-950/30 border border-blue-900/30"
-                        : "text-slate-300 hover:text-slate-100 hover:bg-slate-800"
-                    }`}
-                  >
-                    <FiUser
-                      className={
-                        pathname.startsWith("/dashboard/profile")
-                          ? "text-blue-400"
-                          : "text-slate-400"
-                      }
-                    />
-                    <span>My Profile</span>
-                  </Link>
-
                   <div className="h-[1px] bg-slate-850 my-1" />
 
                   <button
@@ -316,18 +297,6 @@ const Navbar: React.FC = () => {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <Link
-                  href="/dashboard/profile"
-                  onClick={toggleMenu}
-                  className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all border ${
-                    pathname.startsWith("/dashboard/profile")
-                      ? "bg-blue-950/40 border-blue-500/30 text-blue-400"
-                      : "bg-slate-900 hover:bg-slate-850 text-slate-300 border-slate-850"
-                  }`}
-                >
-                  <FiUser />
-                  <span>Profile</span>
-                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center justify-center gap-2 bg-rose-950/40 hover:bg-rose-900/30 text-rose-400 border border-rose-900/40 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer"
