@@ -9,16 +9,19 @@ import {
   FaFilePdf,
 } from "react-icons/fa";
 import { useSession } from "@/lib/auth-client";
-import { getClientApplications } from "@/lib/getApi/jobs";
+import {
+  getClientApplications,
+  updateApplicationStatus,
+} from "@/lib/getApi/jobs";
 
 export default function ViewApplicantsPage() {
   const { data: session, isPending: isSessionPending } = useSession();
   const [applications, setApplications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadApplications() {
-      // সেশন লোড হওয়া পর্যন্ত বা ইমেইল না থাকলে রিকুয়েস্ট পাঠাবে না
       if (!session?.user?.email) return;
 
       setIsLoading(true);
@@ -30,7 +33,6 @@ export default function ViewApplicantsPage() {
         if (res?.success) {
           setApplications(res.applications || []);
         } else if (Array.isArray(res)) {
-          // যদি API সরাসরি array রিটার্ন করে
           setApplications(res);
         }
       } catch (err) {
@@ -44,6 +46,27 @@ export default function ViewApplicantsPage() {
       loadApplications();
     }
   }, [session?.user?.email, isSessionPending]);
+
+  //  status updated
+  const handleStatusUpdate = async (id: string, newStatus: string) => {
+    setUpdatingId(id);
+    try {
+      const res = await updateApplicationStatus(id, newStatus);
+      if (res?.success) {
+        setApplications((prev) =>
+          prev.map((app) =>
+            app._id === id ? { ...app, status: newStatus } : app,
+          ),
+        );
+      } else {
+        alert(res?.message || "Failed to update status");
+      }
+    } catch (err) {
+      console.error("Error updating status:", err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   if (isSessionPending || isLoading) {
     return (
@@ -101,7 +124,7 @@ export default function ViewApplicantsPage() {
                   </p>
 
                   <p className="text-[11px] text-slate-500 mt-1 italic max-w-lg line-clamp-2">
-                    "{app.coverLetter}"
+                    {app.coverLetter}
                   </p>
 
                   <div className="flex items-center gap-3 mt-2">
@@ -128,13 +151,37 @@ export default function ViewApplicantsPage() {
                 </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex items-center gap-2 self-end sm:self-center">
-                <button className="bg-slate-950 hover:bg-rose-500/10 border border-slate-850 hover:border-rose-500/30 text-rose-400 p-2 rounded-xl transition-all cursor-pointer">
-                  <FaTimes size={12} />
-                </button>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer">
-                  <FaCheck size={10} /> Shortlist
-                </button>
+                {updatingId === app._id ? (
+                  <span className="text-xs text-slate-500 animate-pulse">
+                    Updating...
+                  </span>
+                ) : app.status === "shortlisted" ? (
+                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
+                    Shortlisted
+                  </span>
+                ) : app.status === "rejected" ? (
+                  <span className="text-xs font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-xl">
+                    Rejected
+                  </span>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleStatusUpdate(app._id, "rejected")}
+                      className="bg-slate-950 hover:bg-rose-500/10 border border-slate-850 hover:border-rose-500/30 text-rose-400 p-2 rounded-xl transition-all cursor-pointer"
+                      title="Reject Application"
+                    >
+                      <FaTimes size={12} />
+                    </button>
+                    <button
+                      onClick={() => handleStatusUpdate(app._id, "shortlisted")}
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      <FaCheck size={10} /> Shortlist
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

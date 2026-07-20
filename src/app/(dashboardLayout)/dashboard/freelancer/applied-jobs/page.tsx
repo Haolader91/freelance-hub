@@ -109,7 +109,7 @@ export default function AppliedJobsPage() {
                 </p>
 
                 <p className="text-[11px] text-slate-500 italic max-w-lg line-clamp-2">
-                  My Proposal: "{app.coverLetter}"
+                  My Proposal: {app.coverLetter}
                 </p>
 
                 {/* Submitted Resume/Portfolio Link */}

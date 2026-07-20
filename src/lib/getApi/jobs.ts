@@ -125,3 +125,28 @@ export async function getFreelancerApplications(email: string) {
     return { success: false, applications: [] };
   }
 }
+
+// Application-এর status (shortlisted/rejected) আপডেট করার হেল্পার
+export async function updateApplicationStatus(id: string, status: string) {
+  try {
+    const response = await fetch(
+      `${baseUrl}/api/client/applications/${id}/status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update status");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating application status:", error);
+    return { success: false, message: "Error updating status" };
+  }
+}
