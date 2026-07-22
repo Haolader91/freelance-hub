@@ -7,6 +7,7 @@ import { MdCloudUpload } from "react-icons/md";
 import { createApplication } from "@/lib/actions/jobs";
 import { useSession } from "@/lib/auth-client";
 import { IoClose } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 interface ApplyJobModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export default function ApplyJobModal({
 
     // user session check
     if (!session?.user) {
-      alert("Please log in to submit a proposal.");
+      toast.error("Please log in to submit a proposal.");
       return;
     }
 
@@ -85,7 +86,7 @@ export default function ApplyJobModal({
       const data = await createApplication(applicationData);
 
       if (data.success) {
-        alert("Application submitted successfully!");
+        toast.success("Application submitted successfully!");
         setBidAmount("");
         setCoverLetter("");
         setResumeLink("");

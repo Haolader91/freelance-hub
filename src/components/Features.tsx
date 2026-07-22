@@ -20,7 +20,10 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-20 bg-slate-950 text-white border-b border-slate-900">
+    <section
+      id="features"
+      className="py-20 bg-slate-950 text-white border-b border-slate-900"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold bg-linear-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
